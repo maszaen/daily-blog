@@ -99,7 +99,7 @@ async function REGIST(body: any) {
   if (!username || !email || !password) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
-
+ 
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
