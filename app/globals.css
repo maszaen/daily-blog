@@ -61,7 +61,7 @@
     height: 100vh;
   }
   .menu {
-    @apply flex flex-col justify-between z-20 bottom-[0%] h-screen left-[20%] w-[50%] sm:w-[45%] md:w-[40%] lg:w-[30%] xl:w-[20%] px-5 py-[40px] bg-white text-black;
+    @apply flex flex-col absolute justify-between z-20 bottom-[0%] h-screen left-[20%] w-[50%] sm:w-[45%] md:w-[40%] lg:w-[30%] xl:w-[20%] px-5 py-[80px] bg-white text-black;
   }
   .alert {
     font-size: 12px;
