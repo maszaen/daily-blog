@@ -161,7 +161,7 @@ export default function Dashboard() {
           <div className='flex w-full h-full p-2 sm:p-0 sm:pt-2'>
             <ul className='w-full flex flex-col gap-2'>
               {posts.map((post) => (
-                <Link href={`/post/${post._id}`}>
+                <Link href={`/post/${post._id}`} key={post._id}>
                     <li 
                     className='w-full border-[1px] border-secondary rounded-[10px] px-4 py-2 flex flex-col hover:bg-gray-200 active:bg-gray-300' 
                     key={post._id}
