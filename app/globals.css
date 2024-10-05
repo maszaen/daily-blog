@@ -9,21 +9,261 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #181C14;
+    --background: #ffffff;
     --foreground: #ededed;
-    --primaryAccent: #3C3D37;
-    --primaryHover: #697565;
+    --primaryAccent: #0057e7;
+    --primaryHover: #0045b8;
     --secondaryAccent: #909287;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #ffffff;
+    --foreground: #ededed;
+    --primaryAccent: #4285F4;
+    --primaryHover: #0045b8;
+    --secondaryAccent: #909287;
+  }
+}
+
+@layer base {
+  body {
+    color: var(--foreground);
+    background: var(--background);
+    @apply antialiased flex flex-col min-h-screen center;
+  }
+}
+
+@layer components {
+  .topbar {
+    @apply flex flex-row align-middle gap-10 justify-between w-full h-[60px] p-3 px-5 shadow-md;
+    border-bottom: 1px solid var(--secondaryAccent);
+    border-top: none;
+  }
+  .center {
+    @apply items-center justify-center;
+  }
+  .container {
+    @apply flex w-screen xl:px-[200px] lg:px-[150px] md:px-[170px] sm:px-[100px] px-[50px] flex-col items-center;
+  }
+  .containernop {
+    @apply flex w-screen xl:px-[400px] lg:px-[300px] md:px-[150px] sm:px-[100px] flex-col items-center;
+  }
+  .backToast {
+    @apply z-10 flex absolute bottom-[0%] left-[0%] w-full h-full p-2 bg-black/20 backdrop-blur text-white;
+  }
+  .toast {
+    @apply flex m-auto justify-center z-20 bottom-[25%] rounded-[8px] left-[15%] w-[85%] sm:w-[60%] md:w-[40%] lg:w-[30%] xl:w-[25%] p-2 bg-white h-auto text-white;
+  }
+  .backMenu {
+    @apply z-10 flex absolute bottom-[0%] left-[0%] w-full h-full bg-black/20 backdrop-blur;
+  }
+  .menu {
+    @apply flex flex-col justify-between z-20 bottom-[0%] left-[20%] w-[50%] sm:w-[45%] md:w-[40%] lg:w-[30%] xl:w-[20%] p-5 bg-white h-auto text-black;
+  }
+  .alert {
+    font-size: 12px;
+    @apply fixed bottom-5 left-0 w-full p-2 bg-red-500 text-white;
+  }
+  .success {
+    @apply flex flex-col gap-1 w-full px-4 py-3 text-black rounded-md;
+  }
+  .success h1 {
+    @apply text-xl;
+    @apply font-semibold;
+  }
+  .googleAuth {
+    outline: 2px solid gray;
+    color: gray;
+    cursor: pointer;
+  }
+  .googleAuth:hover {
+    outline: 2px solid var(--primaryAccent);
+  }
+  button {
+    background-color: var(--primaryAccent);
+    @apply text-white font-bold py-2 px-4 rounded-full;
+  }
+  button:disabled {
+    background-color: var(--secondaryAccent);
+  }
+  button:disabled:hover {
+    background-color: var(--secondaryAccent);
+  }
+  button:hover {
+    background-color: var(--primaryHover);
+  }
+  .authForm {
+    @apply flex flex-col gap-4 lg:flex-row justify-between w-full rounded-lg relative text-black;
+  }
+  .pageInfo {
+    @apply w-[auto] flex flex-col gap-2;
+  }
+  .inputUser {
+    @apply pt-5 w-full flex flex-col justify-end lg:max-w-[400px];
+  }
+  .authForm h1 {
+    @apply text-4xl font-medium;
+  }
+  .authForm a {
+    color: var(--primaryAccent);
+    @apply font-bold cursor-pointer;
+  }
+  .authForm label {
+    @apply flex flex-col relative;
+    margin-bottom: 15px;
+  }
+  .authForm label input {
+    width: 100%;
+    padding: 18px;
+    display: flex;
+    appearance: none;
+    outline: 2px solid gray;
+    box-shadow: none;
+    border-radius: 3px;
+    height: 50px;
+    width: 100%;
+  }
+  .authForm label textarea {
+    width: 100%;
+    @apply px-1 py-1 text-sm;
+    display: flex;
+    appearance: none;
+    outline: 0px;
+    box-shadow: none;
+    border-radius: 3px;
+    min-height: 200px;
+    width: 100%;
+  }
+  .authForm label span {
+    @apply flex absolute top-1/2 left-2 px-2 py-1 text-sm text-gray-600 bg-white;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.15, 0.83, 0.66, 1);
+    transform: translateY(-50%);
+  }
+  .authForm label input:focus, 
+  .authForm label select:focus {
+    outline: 2px solid var(--primaryAccent);
+  }
+  .authForm label input:focus + span {
+    color: var(--primaryAccent);
+  }
+  .authForm label input:focus + span, 
+  .authForm label select:focus + span,
+  .authForm label input:not(:placeholder-shown) + span,
+  .authForm label select:not([value=""]) + span {
+    scale: 0.85;
+    @apply text-xs;
+    transform: translateY(-185%);
+    pointer-events: none;
+  }
+  .authForm label textarea:focus + span {
+    color: var(--primaryAccent);
+  }
+  .searchContainer {
+    @apply flex flex-col gap-4 justify-between w-full rounded-lg relative text-black;
+  }
+  .searchContainer h1 {
+    @apply text-4xl font-medium;
+  }
+  .searchContainer a {
+    color: var(--primaryAccent);
+    @apply font-bold cursor-pointer;
+  }
+  .searchContainer label {
+    @apply flex flex-col relative;
+    margin-bottom: 15px;
+  }
+  .searchContainer label input {
+    width: 100%;
+    padding: 18px;
+    display: flex;
+    appearance: none;
+    outline: 2px solid gray;
+    box-shadow: none;
+    border-radius: 100px;
+    height: 30px;
+    width: 100%;
+  }
+  .searchContainer label span {
+    @apply flex absolute top-1/2 left-2 px-2 py-1 text-sm text-gray-600 bg-white;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.15, 0.83, 0.66, 1);
+    transform: translateY(-50%);
+  }
+  .searchContainer label input:focus, 
+  .searchContainer label textarea:focus, 
+  .searchContainer label select:focus {
+    outline: 2px solid var(--primaryAccent);
+  }
+  .searchContainer label input:focus + span, 
+  .searchContainer label textarea:focus + span, 
+  .searchContainer label select:focus + span,
+  .searchContainer label input:not(:placeholder-shown) + span,
+  .searchContainer label textarea:not(:placeholder-shown) + span,
+  .searchContainer label select:not([value=""]) + span {
+    scale: 0.85;
+    @apply text-xs;
+    color: var(--primaryAccent);
+    transform: translateY(-150%);
+    pointer-events: none;
+  }
+  .action {
+    @apply flex flex-row gap-5 justify-between items-center pt-5;
+  }
+  hr {
+    border-top: 1px solid var(--secondaryAccent);
+    opacity: 0.7;
+  }
+  .burgerPie {
+    @apply border-0 border-t-4 border-black;
+  }
+  .hamburger {
+    cursor: pointer;
+    @apply flex flex-col items-center place-items-center justify-center;
+  }
+  .hamburger input {
+    display: none;
+  }
+  .hamburger svg {
+    height: 2.5em;
+    transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .line {
+    fill: none;
+    stroke: black;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1;
+    transition:
+      stroke-dasharray 600ms cubic-bezier(0.4, 0, 0.2, 1),
+      stroke-dashoffset 600ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .line-top-bottom {
+    stroke-dasharray: 12 63;
+  }
+  .hamburger input:checked + svg {
+    transform: rotate(-45deg);
+  }
+  .hamburger input:checked + svg .line-top-bottom {
+    stroke-dasharray: 20 300;
+    stroke-dashoffset: -32.42;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+  .blue {
+    color: var(--primaryAccent);
+  }
+  .border-secondary {
+    border: 1px solid var(--secondaryAccent);
+  }
+  .animate {
+    transition: all 0.4s cubic-bezier(0.15, 0.83, 0.66, 1);
+  }
 }
+

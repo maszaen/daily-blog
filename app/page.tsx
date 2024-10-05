@@ -1,33 +1,20 @@
 // app/page.tsx (Home Page)
 'use client'
 import { useState, useEffect } from 'react';
-import { Login } from './api/export';
+import { Auth } from './api/export';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter();
   useEffect(() => {
-    const token = localStorage.getItem(process.env.JWT_SECRET as string);
+    const token = localStorage.getItem('token');
     if (token) {
       setIsAuthenticated(true);
+      router.push('/dashboard');
     }
   }, []);
   return (
-    <div style={{ padding: '20px' }}>
-      {isAuthenticated ? (
-        <div>
-          <h1>Welcome, you're logged in!</h1>
-          <button
-            onClick={() => {
-              localStorage.removeItem(process.env.JWT_SECRET as string);
-              setIsAuthenticated(false);
-            }}
-          >
-            Logout
-          </button>
-        </div>
-      ) : (
-        <Login/>
-      )}
-    </div>
+    <Auth/>
   );
 }
