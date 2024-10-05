@@ -56,12 +56,15 @@
   .toast {
     @apply flex m-auto justify-center z-20 bottom-[25%] rounded-[8px] left-[15%] w-[85%] sm:w-[60%] md:w-[40%] lg:w-[30%] xl:w-[25%] p-2 bg-white h-auto text-white;
   }
-  .backMenu {
+  .blur {
     @apply z-10 fixed bottom-[0%] left-[0%] w-full bg-black/20 backdrop-blur;
     height: 100vh;
   }
+  .backMenu {
+    @apply z-10 flex flex-row justify-center h-full p-2 sm:p-0 sm:pt-2 w-full top-[0%];
+  }
   .menu {
-    @apply flex flex-col absolute justify-between z-20 bottom-[0%] h-screen left-[20%] w-[50%] sm:w-[45%] md:w-[40%] lg:w-[30%] xl:w-[20%] px-5 py-[80px] bg-white text-black;
+    @apply flex flex-col justify-between z-20 top-0 px-4 py-3 w-full rounded-[10px] border-secondary text-black;
   }
   .alert {
     font-size: 12px;
@@ -259,6 +262,9 @@
   }
   .blue {
     color: var(--primaryAccent);
+  }
+  .bg-primary {
+    background-color: var(--primaryAccent);
   }
   .border-secondary {
     border: 1px solid var(--secondaryAccent);

@@ -114,15 +114,20 @@ export default function Login() {
         await new Promise(resolve => setTimeout(resolve, 30));
       }
     };
+    await typeEmail('exqeon@test.com');
 
-    await typeEmail('test@test.test');
-    const password = 'test';
-    setPassword(password);
+    const typePassword = async (password: string) => {
+      for (let i = 1; i <= password.length; i++) {
+        setPassword(password.slice(0, i));
+        await new Promise(resolve => setTimeout(resolve, 30));
+      }
+    };
+    await typePassword('Databasetesting209');
     await new Promise(resolve => setTimeout(resolve, 500));
     try {
       setLoad(true);
-      const testEmail = 'test@test.test';
-      const testPassword = 'test';
+      const testEmail = 'exqeon@test.com';
+      const testPassword = 'Databasetesting209';
       const res = await fetch('/api', {
         method: 'POST',
         headers: {
