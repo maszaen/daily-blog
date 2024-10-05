@@ -1,7 +1,7 @@
 // app/page.tsx (Home Page)
 'use client'
 import { useEffect } from 'react';
-import { Auth } from './api/export';
+import { Auth } from './export';
 import { useRouter } from 'next/navigation';
 
 export default function Home() {

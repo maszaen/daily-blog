@@ -61,7 +61,8 @@
     height: 100vh;
   }
   .backMenu {
-    @apply z-10 flex flex-row justify-center h-full p-2 sm:p-0 sm:pt-2 w-full top-[0%];
+    @apply z-10 flex flex-row justify-center h-full p-2 sm:p-0 sm:pt-2 w-full top-[0%] bg-white;
+    user-select: none;
   }
   .menu {
     @apply flex flex-col justify-between z-20 top-0 px-4 py-3 w-full rounded-[10px] border-secondary text-black;
@@ -137,7 +138,7 @@
     outline: 0px;
     box-shadow: none;
     border-radius: 3px;
-    min-height: 200px;
+    min-height: 400px;
     width: 100%;
   }
   .authForm label span {
@@ -166,6 +167,7 @@
     color: var(--primaryAccent);
   }
   .searchContainer {
+    user-select: none;
     @apply flex flex-col gap-4 justify-between w-full rounded-lg relative text-black;
   }
   .searchContainer h1 {
@@ -253,6 +255,9 @@
   .hamburger input:checked + svg .line-top-bottom {
     stroke-dasharray: 20 300;
     stroke-dashoffset: -32.42;
+  }
+  .navItems {
+    @apply block py-1 hover:font-semibold;
   }
 }
 
