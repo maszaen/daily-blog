@@ -9,7 +9,7 @@ export default function Home() {
   const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
+    if (isAuthenticated || token) {
       setIsAuthenticated(true);
       router.push('/dashboard');
     }

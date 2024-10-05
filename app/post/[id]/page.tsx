@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 
 export default function PostDetail() {
-  const router = useRouter();
   const { id } = useParams();
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
