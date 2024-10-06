@@ -3,11 +3,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import jwt from 'jsonwebtoken';
 
-export default function Topbar() {
+interface TopbarProps {
+  onSearch: (value: string) => void;
+}
+
+const Topbar: React.FC<TopbarProps> = ({ onSearch }) => {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [menu, setMenu] = useState(false);
+  const [searchInput, setSearchInput] = useState('');
   
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
@@ -57,12 +62,18 @@ export default function Topbar() {
     setMenu(event.target.checked);
   };
 
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSearchInput(value);
+    onSearch(value);
+  };
+
   return (
     <div className="w-full h-full">
       <div className='topbar'>
         <div className='searchContainer'>
           <label>
-            <input type='text' placeholder='' className='w-full' />
+            <input onChange={handleInputChange} value={searchInput} type='text' placeholder='' className='w-full' />
             <span className=' rounded-full'>Search</span>
           </label>
         </div>
@@ -109,7 +120,7 @@ export default function Topbar() {
                     <p className='navItems'>Privacy Policy</p>
                   </Link>
                   <Link href='/create'>
-                    <p className='navItems'>About</p>
+                    <p className='navItems'>Settings</p>
                   </Link>
                 </div>
               </div>
@@ -127,3 +138,5 @@ export default function Topbar() {
     </div>
   );
 }
+
+export default Topbar;

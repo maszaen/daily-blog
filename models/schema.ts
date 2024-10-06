@@ -36,6 +36,7 @@ interface IPost extends Document {
   userId: Schema.Types.ObjectId;
   title: string;
   content: string;
+  category: string;
   comments: Schema.Types.ObjectId[];
   createdAt: Date;
 }
@@ -43,6 +44,7 @@ const PostSchema: Schema = new Schema({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   title: { type: String, required: true },
   content: { type: String, required: true },
+  category: { type: String, required: true },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   createdAt: { type: Date, default: Date.now },
 });

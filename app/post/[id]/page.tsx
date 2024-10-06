@@ -61,23 +61,52 @@ export default function PostDetail() {
     });
   }
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      hour: '2-digit',
+      minute: '2-digit',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour12: false,
+    };
+    const formattedTime = date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const formattedDate = date.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+    return `${formattedTime}, ${formattedDate}`;
+  };
+
   return (
     <div className='containernop w-full text-black h-screen'>
       <div className='p-4'>
-        <h1 className='text-4xl mb-4'>{post.title}</h1>
+        <h1 className='text-4xl mb-2'>{post.title}</h1>
+        <div className='flex mb-4 flex-col lg:flex-row lg:gap-4 w-full justify-start items start'>
+        <p className='text-sm lg:text-md'>{post.category}</p>
+        <p className='text-sm lg:text-md'>{formatDate(post.createdAt)}</p>
+        <p className='text-sm lg:text-md'>Posted by: {post.userId?.username || 'Unknown'}</p>
+        </div>
         <hr className='mb-3'/>
         <div>{formatContent(post.content)}</div>
-
-        <p>Posted by: {post.userId?.username || 'Unknown'}</p>
-        <p>Comments: {post.comments.length}</p>
-
-        <ol>
-          {post.comments.map((comment: any, index: number) => (
-            <li key={comment._id} style={{ margin: '10px 0' }}>
-              {comment.content}
-            </li>
-          ))}
-        </ol>
+        <hr className='mt-4'/>      
+        <div className='pt-4'>
+          <p>Comments: {post.comments.length}</p>
+        
+          <ol>
+            {post.comments.map((comment: any, index: number) => (
+              <li key={comment._id} style={{ margin: '10px 0' }}>
+                {comment.content}
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </div>
   );
