@@ -1,18 +1,13 @@
-// lib/db.ts
 import mongoose from "mongoose";
 
 let isConnected = false;
 
 export const connectToDB = async () => {
   mongoose.set("strictQuery", true);
-
   if (!process.env.MONGODB_URL) {
-    console.log("Missing MongoDB URL");
     return;
   }
-
   if (isConnected) {
-    console.log("MongoDB connection already established");
     return;
   }
 
@@ -22,8 +17,8 @@ export const connectToDB = async () => {
     });
 
     isConnected = true;
-    console.log("MongoDB connected");
+    console.log("Server connected");
   } catch (error) {
-    console.log("Error connecting to MongoDB:", error);
+    console.log("Error connecting to server:", error);
   }
 };

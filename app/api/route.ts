@@ -21,13 +21,13 @@ export async function POST(req: NextRequest) {
     
     const selectedAction = actions[action];
     if (!selectedAction) {
-      return NextResponse.json({ error: 'Invalid action', conn: false, act: false }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid action'}, { status: 400 });
     }
 
     return await selectedAction(body);
   } catch (error) {
     console.error('Error processing request:', error);
-    return NextResponse.json({ error: 'Internal server error', conn: false, act: false }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error'}, { status: 500 });
   }
 }
 
@@ -35,27 +35,27 @@ export async function POST(req: NextRequest) {
 async function LOGIN(body: any) {
   const { email, password } = body;
   if (!email || !password) {
-    return NextResponse.json({ error: 'Missing required fields', conn: false, act: false }, { status: 400 });
+    return NextResponse.json({ error: 'Missing required fields'}, { status: 400 });
   }
   try {
     const user = await User.findOne({ email });
     if (!user) {
-      return NextResponse.json({ error: 'Invalid email or password', conn: false, act: false }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid email or password'}, { status: 401 });
     }
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return NextResponse.json({ error: 'Invalid email or password', conn: false, act: false }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid email or password'}, { status: 401 });
     }
     const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET!, {
       expiresIn: '2d',
     });
     return NextResponse.json(
-      { message: 'Login successful', token, username: user.username, email: user.email, conn: false, act: false },
+      { message: 'Login successful', token, username: user.username, email: user.email},
       { status: 200 }
     );
   } catch (error) {
     console.error('Error logging in:', error);
-    return NextResponse.json({ error: 'Error logging in', conn: false, act: false }, { status: 500 });
+    return NextResponse.json({ error: 'Error logging in'}, { status: 500 });
   }
 }
 
@@ -63,13 +63,13 @@ async function LOGIN(body: any) {
 async function REGIST(body: any) {
   const { username, email, password } = body;
   if (!username || !email || !password) {
-    return NextResponse.json({ error: 'Missing required fields', conn: false, act: false }, { status: 400 });
+    return NextResponse.json({ error: 'Missing required fields'}, { status: 400 });
   }
 
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return NextResponse.json({ error: 'Email is already in use', conn: false, act: false }, { status: 400 });
+      return NextResponse.json({ error: 'Email is already in use'}, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -82,10 +82,10 @@ async function REGIST(body: any) {
     });
     await newUser.save();
 
-    return NextResponse.json({ message: 'User registered successfully', conn: false, act: false }, { status: 201 });
+    return NextResponse.json({ message: 'User registered successfully'}, { status: 201 });
   } catch (error) {
     console.error('Error registering user:', error);
-    return NextResponse.json({ error: 'Error creating user', conn: false, act: false }, { status: 500 });
+    return NextResponse.json({ error: 'Error creating user'}, { status: 500 });
   }
 }
 
@@ -94,7 +94,7 @@ async function CREATE_POST(body: any) {
   const { title, content, token, category } = body;
 
   if (!title || !content || !token) {
-    return NextResponse.json({ error: 'Missing required fields', conn: false, act: false }, { status: 400 });
+    return NextResponse.json({ error: 'Missing required fields'}, { status: 400 });
   }
 
   try {
@@ -102,7 +102,7 @@ async function CREATE_POST(body: any) {
     const userId = (decodedToken as jwt.JwtPayload).id;
     const user = await User.findById(userId);
     if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: 'Access denied', conn: false, act: false }, { status: 403 });
+      return NextResponse.json({ error: 'Access denied'}, { status: 403 });
     }
 
     const newPost = new Post({
@@ -115,10 +115,10 @@ async function CREATE_POST(body: any) {
     });
     await newPost.save();
 
-    return NextResponse.json({ message: 'Post created successfully', conn: false, act: false }, { status: 201 });
+    return NextResponse.json({ message: 'Post created successfully'}, { status: 201 });
   } catch (error) {
     console.error('Error creating post:', error);
-    return NextResponse.json({ error: 'Error creating post', conn: false, act: false }, { status: 500 });
+    return NextResponse.json({ error: 'Error creating post'}, { status: 500 });
   }
 }
 
@@ -126,17 +126,17 @@ async function CREATE_POST(body: any) {
 async function GET_USER_BY_ID(body: any) {
   const { userId } = body;
   if (!userId) {
-    return NextResponse.json({ error: 'Missing userId', conn: false, act: false }, { status: 400 });
+    return NextResponse.json({ error: 'Missing userId'}, { status: 400 });
   }
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return NextResponse.json({ error: 'User not found', conn: false, act: false }, { status: 404 });
+      return NextResponse.json({ error: 'User not found'}, { status: 404 });
     }
-    return NextResponse.json({ user, conn: false, act: false }, { status: 200 });
+    return NextResponse.json({ user}, { status: 200 });
   } catch (error) {
     console.error('Error fetching user by ID:', error);
-    return NextResponse.json({ error: 'Error fetching user by ID', conn: false, act: false }, { status: 500 });
+    return NextResponse.json({ error: 'Error fetching user by ID'}, { status: 500 });
   }
 }
 
@@ -145,19 +145,19 @@ async function GET_POST_BY_ID(body: any) {
   const { postId } = body;
 
   if (!postId) {
-    return NextResponse.json({ error: 'Missing postId', conn: false, act: false }, { status: 400 });
+    return NextResponse.json({ error: 'Missing postId'}, { status: 400 });
   }
 
   try {
     const post = await Post.findById(postId).populate('userId').populate('comments');
     if (!post) {
-      return NextResponse.json({ error: 'Post not found', conn: false, act: false }, { status: 404 });
+      return NextResponse.json({ error: 'Post not found'}, { status: 404 });
     }
 
-    return NextResponse.json({ post, conn: false, act: false }, { status: 200 });
+    return NextResponse.json({ post}, { status: 200 });
   } catch (error) {
     console.error('Error fetching post by ID:', error);
-    return NextResponse.json({ error: 'Error fetching post by ID', conn: false, act: false }, { status: 500 });
+    return NextResponse.json({ error: 'Error fetching post by ID'}, { status: 500 });
   }
 }
 
@@ -175,13 +175,13 @@ export async function GET(req: NextRequest) {
     
     const selectedAction = actions[action!];
     if (!selectedAction) {
-      return NextResponse.json({ error: 'Invalid action', conn: false, act: false }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid action'}, { status: 400 });
     }
 
     return await selectedAction(req);
   } catch (error) {
     console.error('Error processing request:', error);
-    return NextResponse.json({ error: 'Internal server error', conn: false, act: false }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error'}, { status: 500 });
   }
 }
 
@@ -189,10 +189,10 @@ export async function GET(req: NextRequest) {
 async function GET_USERS(req: NextRequest) {
   try {
     const users = await User.find();
-    return NextResponse.json({ users, conn: false, act: false }, { status: 200 });
+    return NextResponse.json({ users}, { status: 200 });
   } catch (error) {
     console.error('Error fetching users:', error);
-    return NextResponse.json({ error: 'Error fetching users', conn: false, act: false }, { status: 500 });
+    return NextResponse.json({ error: 'Error fetching users'}, { status: 500 });
   }
 }
 
@@ -211,9 +211,9 @@ async function GET_POSTS(req: NextRequest) {
       .populate('comments')
       .sort({ createdAt: -1 });
 
-    return NextResponse.json({ posts, conn: false, act: false }, { status: 200 });
+    return NextResponse.json({ posts}, { status: 200 });
   } catch (error) {
     console.error('Error fetching posts:', error);
-    return NextResponse.json({ error: 'Error fetching posts', conn: false, act: false }, { status: 500 });
+    return NextResponse.json({ error: 'Error fetching posts'}, { status: 500 });
   }
 }

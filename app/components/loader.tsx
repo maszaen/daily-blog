@@ -1,11 +1,8 @@
-import { useState } from "react";
-
 interface LoaderProps {
-  getPost: boolean;
   conn: boolean;
 }
 
-export default function Loader({ getPost, conn }: LoaderProps) {
+export default function Loader({ conn }: LoaderProps) {
   return (
   <div className="flex flex-col relative justify-center items-center">
     <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="loader">
@@ -25,11 +22,10 @@ export default function Loader({ getPost, conn }: LoaderProps) {
       <path pathLength="360" d="M 49.5975 9.0325 V 19.3422 H 38.689 C 38.5937 18.6105 38.5061 17.9301 38.4329 17.3569 C 38.2063 15.5828 37.4422 13.9868 36.2237 12.7413 C 34.8748 11.3624 33.2514 10.6633 31.3984 10.6633 C 27.3688 10.6633 25.8233 13.5309 25.556 15.0901 C 25.1526 15.5932 24.3175 16.7856 23.916 18.46 C 23.8568 18.7069 23.8106 19.0066 23.7778 19.3421 H 14.4025 V 9.0323 H 49.5975 Z"></path>
       <path pathLength="360" d="M 30.2223 21.2875 C 30.5674 21.2875 30.8471 21.0195 30.8471 20.6889 V 18.92 L 31.9916 18.9675 C 32.3376 18.9833 32.628 18.7259 32.643 18.3956 C 32.658 18.0654 32.3907 17.786 32.0459 17.7717 L 30.2495 17.6969 C 30.077 17.6889 29.9133 17.7497 29.7902 17.8624 C 29.6671 17.9753 29.5976 18.1315 29.5976 18.2948 V 20.6889 C 29.5974 21.0195 29.8772 21.2875 30.2223 21.2875 Z"></path>
     </svg>
-    {getPost && 
+    {conn ? 
     <p className='flex absolute bottom-[-20%] text-xl font-semibold'>Fetching posts...</p>
-    }
-    {conn && 
-    <p className='flex absolute bottom-[-20%] text-xl font-semibold'>Connecting...</p>
+    :
+    <p className='flex absolute bottom-[-20%] text-xl font-semibold'>Loading data...</p>
     }
   </div>
   );

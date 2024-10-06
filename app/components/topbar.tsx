@@ -73,7 +73,7 @@ const Topbar: React.FC<TopbarProps> = ({ onSearch }) => {
       <div className='topbar'>
         <div className='searchContainer'>
           <label>
-            <input onChange={handleInputChange} value={searchInput} type='text' placeholder='' className='w-full' />
+            <input onChange={handleInputChange} value={searchInput} type='text' placeholder='' className='w-full p-[18px]' />
             <span className=' rounded-full'>Search</span>
           </label>
         </div>

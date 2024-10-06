@@ -7,12 +7,12 @@ export default function Dashboard() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [conn, setConn] = useState(false);
-  const [getPost, setGetPost] = useState(false);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
+      setConn(true);
       try {
         const response = await fetch(`/api?action=GET_POSTS&query=${encodeURIComponent(search)}`, {
           method: 'GET',
@@ -20,8 +20,7 @@ export default function Dashboard() {
         });
         
         const data = await response.json();
-        setConn(data.conn);
-        setGetPost(data.act);
+        setConn(false);
         if (data.posts) {
           setLoading(false);
           setPosts(data.posts);
@@ -60,7 +59,7 @@ export default function Dashboard() {
       
       {loading ? (
         <div className='flex flex-col w-full justify-center items-center h-screen select-none'>
-          <Loader conn={conn} getPost={getPost} />
+          <Loader conn={conn} />
         </div>
       ) : (
         <div className='flex flex-col w-full h-screen select-none'>

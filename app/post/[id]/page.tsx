@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import Image from 'next/image';
+import send from '../../assets/send.svg';
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -89,16 +91,28 @@ export default function PostDetail() {
       <div className='p-4'>
         <h1 className='text-4xl mb-2'>{post.title}</h1>
         <div className='flex mb-4 flex-col lg:flex-row lg:gap-4 w-full justify-start items start'>
-        <p className='text-sm lg:text-md'>{post.category}</p>
+        {post.category === !null ? 
+          <p className='text-sm lg:text-md'>{post.category}</p>
+          : 
+          <p className='text-sm lg:text-md'>General</p>
+        }
         <p className='text-sm lg:text-md'>{formatDate(post.createdAt)}</p>
         <p className='text-sm lg:text-md'>Posted by: {post.userId?.username || 'Unknown'}</p>
         </div>
         <hr className='mb-3'/>
         <div>{formatContent(post.content)}</div>
-        <hr className='mt-4'/>      
-        <div className='pt-4'>
+        <div className='pt-4 h-auto'>
+          <div className='searchContainer flex-row items-center h-full'>
+            <label className='w-full'>
+              <input  type='text' placeholder='' className='w-full p-[18px] pr-[50px]' />
+              <span className=' rounded-full'>Write your comment...</span>
+            </label>
+            <div className='flex justify-center absolute top-0 mb-auto items-center right-0 w-[50px] h-[36px] rounded-full'>
+              <Image src={send} alt="Send" className='w-[25px] h-[25px] hover:fillblue' />
+            </div>
+          </div>
           <p>Comments: {post.comments.length}</p>
-        
+          <hr className='mt-4'/>
           <ol>
             {post.comments.map((comment: any, index: number) => (
               <li key={comment._id} style={{ margin: '10px 0' }}>
