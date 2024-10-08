@@ -141,7 +141,7 @@ export default function PostDetail() {
       <div className='p-4 w-full'>
         <h1 className='text-4xl mb-2 w-full'>{post.title}</h1>
         <div className='flex mb-4 flex-col lg:flex-row lg:gap-4 w-full justify-start items start'>
-          {post.category === !null ? 
+          {post.category ? 
             <p className='text-sm lg:text-md'>{post.category}</p>
             : 
             <p className='text-sm lg:text-md'>General</p>
