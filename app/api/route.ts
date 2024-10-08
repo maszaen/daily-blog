@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { connectToDB } from '@/lib/db';
-import { User, Post } from '@/models/schema';
+import { User, Post, Comment } from '@/models/schema';
 import jwt from 'jsonwebtoken';
 
 // POST
@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
       LOGIN,
       REGIST,
       CREATE_POST,
+      DELETE_POST,
+      CREATE_COMMENT,
       GET_USER_BY_ID,
       GET_POST_BY_ID,
     };
@@ -90,19 +92,19 @@ async function REGIST(body: any) {
 }
 
 // CREATE_POST
-async function CREATE_POST(body: any) {
+const CREATE_POST = async (body: any) => {
   const { title, content, token, category } = body;
 
-  if (!title || !content || !token) {
-    return NextResponse.json({ error: 'Missing required fields'}, { status: 400 });
+  if (!title || !content || !token || !category) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
     const userId = (decodedToken as jwt.JwtPayload).id;
     const user = await User.findById(userId);
-    if (!user || !user.isAdmin) {
-      return NextResponse.json({ error: 'Access denied'}, { status: 403 });
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     const newPost = new Post({
@@ -110,15 +112,93 @@ async function CREATE_POST(body: any) {
       title,
       content,
       category,
-      comments: [],
       createdAt: new Date(),
     });
     await newPost.save();
 
-    return NextResponse.json({ message: 'Post created successfully'}, { status: 201 });
+    await User.findByIdAndUpdate(userId, {
+      $push: { posts: newPost._id },
+    });
+    return NextResponse.json({ message: 'Post created successfully', post: newPost }, { status: 201 });
   } catch (error) {
     console.error('Error creating post:', error);
-    return NextResponse.json({ error: 'Error creating post'}, { status: 500 });
+    return NextResponse.json({ error: 'Error creating post' }, { status: 500 });
+  }
+};
+
+// DELETE_POST
+async function DELETE_POST(body: any) {
+  const { postId, token } = body;
+  
+  if (!postId || !token) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  }
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
+    const userId = (decodedToken as jwt.JwtPayload).id;
+    const post = await Post.findById(postId);
+    if (!post) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+    if (post.userId.toString() !== userId) {
+      return NextResponse.json({ error: 'Not authorized to delete this post' }, { status: 403 });
+    }
+
+    await Comment.deleteMany({ postId: postId });
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { posts: postId }
+    });
+    await Post.findByIdAndDelete(postId);
+
+    return NextResponse.json({ message: 'Post deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    return NextResponse.json({ error: 'Error deleting post' }, { status: 500 });
+  }
+}
+
+
+// CREATE_COMMENT
+async function CREATE_COMMENT(body: any) {
+  const { content, token, postId } = body;
+  if (!content || !token || !postId) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
+    const userId = (decodedToken as jwt.JwtPayload).id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+    const newComment = new Comment({
+      userId,
+      postId,
+      content,
+      createdAt: new Date(),
+    });
+    
+    await newComment.save();
+    await User.findByIdAndUpdate(userId, {
+      $push: { comments: newComment._id },
+    });
+
+    await Post.findByIdAndUpdate(postId, {
+      $push: { comments: newComment._id },
+    });
+
+    return NextResponse.json({ message: 'Comment created successfully', comment: newComment }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating comment:', error);
+    return NextResponse.json({ error: 'Error creating comment' }, { status: 500 });
   }
 }
 
@@ -143,13 +223,15 @@ async function GET_USER_BY_ID(body: any) {
 // GET_POST_BY_ID
 async function GET_POST_BY_ID(body: any) {
   const { postId } = body;
-
   if (!postId) {
     return NextResponse.json({ error: 'Missing postId'}, { status: 400 });
   }
 
   try {
-    const post = await Post.findById(postId).populate('userId').populate('comments');
+    const post = await Post.findById(postId).populate('userId').populate('comments').populate({
+      path: 'comments',
+      populate: { path: 'userId' },
+    });
     if (!post) {
       return NextResponse.json({ error: 'Post not found'}, { status: 404 });
     }
@@ -165,7 +247,6 @@ async function GET_POST_BY_ID(body: any) {
 export async function GET(req: NextRequest) {
   try {
     const action = req.nextUrl.searchParams.get('action');
-    
     await connectToDB();
     
     const actions: { [key: string]: (req: NextRequest) => Promise<any> } = {
@@ -209,8 +290,13 @@ async function GET_POSTS(req: NextRequest) {
     })
       .populate('userId')
       .populate('comments')
+      .populate({
+        path: 'comments',
+        populate: { 
+          path: 'userId', populate:{path: 'username'} },
+      })
       .sort({ createdAt: -1 });
-
+      
     return NextResponse.json({ posts}, { status: 200 });
   } catch (error) {
     console.error('Error fetching posts:', error);

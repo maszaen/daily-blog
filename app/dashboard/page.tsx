@@ -1,7 +1,9 @@
 'use client'
-import { SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Topbar, Loader } from '../export';
+import Image from 'next/image';
+import downArr from '../assets/down-arrow.svg';
 
 export default function Dashboard() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -46,11 +48,39 @@ export default function Dashboard() {
       year: 'numeric',
       hour12: false,
     };
-    return `${date.toLocaleTimeString('en-US', options)}, ${date.toLocaleDateString('en-US', options)}`;
+    return `${date.toLocaleTimeString('en-US', options)}`;
   };
 
   const handleSearch = (value: string) => {
     setSearch(value);
+  };
+
+  const deletePost = async (postId: string) => {
+    const confirmDelete = confirm('Are you sure you want to delete this post?');
+    if (!confirmDelete) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(`/api`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'DELETE_POST', postId, token: localStorage.getItem('token') }),
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        setPosts((prevPosts) => prevPosts.filter((post) => post._id !== postId));
+        alert('Post deleted successfully');
+      } else {
+        console.error('Failed to delete post:', data.error);
+        alert('Error deleting post');
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error('Error deleting post:', error);
+      alert('Error deleting post');
+    }
   };
 
   return (
@@ -67,22 +97,42 @@ export default function Dashboard() {
             <div className='flex w-full h-full p-2 sm:p-0 sm:pt-2'>
               <ul className='w-full flex flex-col gap-2'>
                 {posts.map((post) => (
-                  <Link href={`/post/${post._id}`} key={post._id}>
+                  
                     <li
-                      className='w-full border-[1px] border-secondary rounded-[10px] px-4 py-2 flex flex-col hover:bg-gray-200 active:bg-gray-300'
-                      key={post._id}
-                    >
-                      <div className='w-full'>
-                        <p className='text-xs'>Posted by @{post.userId?.username || 'Unknown'} | {formatDate(post.createdAt)}</p>
-                        <h3 className='font-semibold'>{post.title}</h3>
+                      className='w-full relative border-[1px] border-secondary rounded-[10px] px-4 py-2 flex flex-col hover:bg-gray-200 active:bg-gray-300'
+                      key={post._id}>
+                      <div className='w-full flex flex-row justify-between'>
+                        <Link href={`/post/${post._id}`} key={post._id}>
+                          <p className='text-xs'>Posted by @{post.userId?.username || 'Unknown'} | {formatDate(post.createdAt)}</p>
+                          <h3 className='font-semibold'>{post.title}</h3>
+                        </Link>
+                        <div
+                          className='text-red-500 hover:text-red-700 text-sm'
+                          onClick={() => deletePost(post._id)}>
+                            <Image src={downArr} width={20} height={20} alt={'Menu'}/>
+                        </div>
                       </div>
                       <hr className='my-2'/>
                       <div className='text-xs flex flex-row justify-between'>
-                        <p>Category: {post.category}</p>
+                        <p>Category: {post.category || "General"}</p>
                         <p>Comments: {post.comments.length}</p>
                       </div>
+                      <div className='flex justify-end'>
+                    </div>
+
+                    <div className='flex absolute top-0 right-0 px-3 w-[40%] py-1 border-secondary rounded-[7px] bg-white mr-1 mt-1'>
+                      <div>
+                        <h1>Options</h1>
+                        <div>
+                          <p>Delete</p>
+                          <p>Edit</p>
+                          <p></p>
+                        </div>
+                      </div>
+                    </div>
+
                     </li>
-                  </Link>
+                  
                 ))}
               </ul>
             </div>

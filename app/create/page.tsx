@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Topbar } from '../export';
 
 export default function CreatePost() {
   const [title, setTitle] = useState('');

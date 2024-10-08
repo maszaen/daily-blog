@@ -6,6 +6,7 @@ interface IUser extends Document {
   password: string;
   bio: string;
   isAdmin: boolean;
+  comments: Schema.Types.ObjectId[];
   createdAt: Date;
 }
 const UserSchema: Schema = new Schema({
@@ -14,6 +15,8 @@ const UserSchema: Schema = new Schema({
   password: { type: String, required: true },
   bio: { type: String, required: false },
   isAdmin: { type: Boolean, default: false },
+  posts: [{ type: Schema.Types.ObjectId, ref: 'Post' }],  // Menyimpan referensi ke postingan
+  comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],  // Menyimpan referensi ke komentar
   createdAt: { type: Date, default: Date.now },
 });
 export const User = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
