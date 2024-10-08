@@ -91,8 +91,6 @@ export default function PostDetail() {
     return `${date.toLocaleTimeString('en-US', options)}`;
   };
 
-  
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
   
