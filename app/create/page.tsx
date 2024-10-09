@@ -114,7 +114,7 @@ export default function CreatePost() {
           </p>
           <div>
             <button type="submit" disabled={isSubmitting} className='submit'>
-              {isSubmitting ? 'Creating...' : 'Create Post'}
+              {isSubmitting ? 'Creating ...' : 'Create Post'}
             </button>
           </div>
         </div>

@@ -175,12 +175,12 @@ export default function PostDetail() {
           <div className='flex w-full h-full py-2 sm:p-0 sm:pt-2'>
             <ol className='w-full flex flex-col gap-2'>
               {post?.comments?.length > 0 ? (
-                post.comments.map((comment: any, index: number) => (
+                post.comments.map((comment: any) => (
                   <li key={comment._id} className='w-full border-[1px] border-secondary rounded-[10px] px-4 py-2 flex flex-col hover:bg-gray-200 active:bg-gray-300'>
-                    {comment?.content || 'No content available'}
                       <p className='text-sm text-gray-600'>
-                        Posted by: {comment.userId?.username || username} at {formatDate(comment.createdAt)}
+                        @{comment.userId?.username || username} at {formatDate(comment.createdAt)}
                       </p>
+                      {comment?.content || 'No content available'}
                   </li>
                 ))
               ) : (
