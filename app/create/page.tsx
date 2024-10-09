@@ -180,9 +180,9 @@ export default function CreatePost() {
 
           {error && <p className='font-semibold text-center' style={{ color: 'red' }}>{error}</p>}
           {content.length > 0 && (
-            <div className='mt-4 border rounded-[3px]' style={{ margin: 'auto', backgroundColor: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+            <div className='mt-4 border rounded-[4px]' style={{ margin: 'auto' }}>
               <h3 className='font-semibold mb-4 mt-4'>Preview Content:</h3>
-              <div style={{ border: '1px solid #ccc', padding: '25px', backgroundColor: '#f9f9f9', borderRadius: '4px' }}>
+              <div style={{ border: '1px solid #ccc', padding: '25px', backgroundColor: '#f9f9f9',boxShadow: '0 2px 5px rgba(0,0,0,0.1)', borderRadius: '4px' }}>
                 {content.map((item, index) => (
                   <div
                     key={index}
