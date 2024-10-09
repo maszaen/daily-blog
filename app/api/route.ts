@@ -104,8 +104,12 @@ const CREATE_POST = async (body: any) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
     const userId = (decodedToken as jwt.JwtPayload).id;
     const user = await User.findById(userId);
+    
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    if (!Array.isArray(content) || content.length === 0) {
+      return NextResponse.json({ error: 'Invalid content format' }, { status: 400 });
     }
 
     const newPost = new Post({
@@ -115,17 +119,21 @@ const CREATE_POST = async (body: any) => {
       category,
       createdAt: new Date(),
     });
+    
     await newPost.save();
 
     await User.findByIdAndUpdate(userId, {
       $push: { posts: newPost._id },
     });
+    
     return NextResponse.json({ message: 'Post created successfully', post: newPost }, { status: 201 });
   } catch (error) {
     console.error('Error creating post:', error);
-    return NextResponse.json({ error: 'Error creating post' }, { status: 500 });
+    const errorMessage = (error as Error).message;
+    return NextResponse.json({ error: `Error creating post: ${errorMessage}` }, { status: 500 });
   }
 };
+
 
 // DELETE_POST
 async function DELETE_POST(body: any) {

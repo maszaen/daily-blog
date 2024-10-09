@@ -294,6 +294,64 @@
   .fillblue {
     fill: var(--primaryAccent);
   }
+  .drop-container {
+    width: 100% !important;
+    position: relative !important;
+    display: flex !important;
+    gap: 10px !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    height: 200px !important;
+    padding: 20px !important;
+    border-radius: 7px !important;
+    border: 2px dashed var(--secondaryAccent) !important;
+    color: #444 !important;
+    cursor: pointer !important;
+    transition: background .2s ease-in-out, border .2s ease-in-out !important;
+  }
+  .drop-container input {
+    @apply xl:w-[400px] lg:w-[300px] md:w-[200px] sm:w-[150px] w-[100px] !important;
+    width: 80% !important;
+    height: 50px !important;
+    display: flex !important;
+    appearance: none !important;
+    outline: 2px solid var(--secondaryAccent) !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 50px !important;
+    margin: 0 auto !important;
+    padding: 3px 4px !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+  input[type=file]::file-selector-button {
+    margin-right: 20px;
+    border: none;
+    background: var(--secondaryAccent);
+    @apply hover:bg-primary font-semibold;
+    padding: 10px 20px;
+    border-radius: 50px;
+    color: #fff;
+    cursor: pointer;
+    transition: background .2s ease-in-out;
+  }
+  .drop-container:hover {
+    background: #eee !important;
+    border-color: #111 !important;
+  }
+  
+  .drop-container:hover .drop-title {
+    color: #222 !important;
+  }
+  
+  .drop-title {
+    color: #444 !important;
+    font-size: 20px !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    transition: color .2s ease-in-out !important;
+  }
 }
 
 @layer utilities {
