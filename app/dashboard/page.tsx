@@ -13,7 +13,7 @@ export default function Dashboard() {
   const [search, setSearch] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [menuOpen, setMenuOpen] = useState<string | null>(null); // State to track the open menu
+  const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function Dashboard() {
   };
 
   const toggleMenu = (postId: string) => {
-    setMenuOpen(prevMenuOpen => (prevMenuOpen === postId ? null : postId)); // Toggle the menu
+    setMenuOpen(prevMenuOpen => (prevMenuOpen === postId ? null : postId));
   };
 
   const deletePost = async (postId: string) => {
@@ -92,7 +92,7 @@ export default function Dashboard() {
       if (response.ok) {
         setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
         alert('Post deleted successfully');
-        setMenuOpen(null); // Close the menu after deletion
+        setMenuOpen(null);
       } else {
         console.error('Failed to delete post:', data.error);
         alert('Error deleting post');
@@ -143,14 +143,14 @@ export default function Dashboard() {
                           <div className='flex flex-row w-full justify-between items-end'>
                             <h1 className='text-xs'>Options</h1>
                             <h1 className='text-xs text-red-600 hover:font-semibold hover:blue cursor-pointer' onClick={() => toggleMenu(post._id)}>Close</h1>
-                            </div>
-                            <hr className='mt-1'/>
-                            <div className='w-full flex flex-col gap-2 mt-1 text-sm'>
+                          </div>
+                          <hr className='mt-1'/>
+                          <div className='w-full flex flex-col gap-2 mt-1 text-sm'>
                             {post.userId.email === email && (
-                              <div className='gap-2 flex flex-col'>
+                            <div className='gap-2 flex flex-col'>
                               <p onClick={() => deletePost(post._id)} className='cursor-pointer hover:font-semibold hover:text-red-600'>Delete Post</p>
                               <p className='cursor-pointer hover:font-semibold hover:blue'>Edit Post</p>
-                              </div>
+                            </div>
                             )}
                             <p className='cursor-pointer hover:font-semibold'>Profile @{post.userId.username} {post.userId.username === username ? "(You)" : ""}</p>
                             <p className='cursor-pointer hover:font-semibold hover:text-green-600'>Donate Creator</p>

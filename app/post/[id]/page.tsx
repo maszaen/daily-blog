@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import send from '../../assets/send.svg';
+import downArr from '../../assets/down-arrow.svg';
 
 export default function PostDetail() {
   const router = useRouter();
@@ -14,6 +15,8 @@ export default function PostDetail() {
   const [content, setContent] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [menuOpen, setMenuOpen] = useState<string | null>(null);
+  const [comments, setComments] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -53,15 +56,12 @@ export default function PostDetail() {
       router.push('/');
     }
   }, [router]);
-
   if (loading) {
     return <p>Loading...</p>;
   }
-
   if (error) {
     return <p>{error}</p>;
   }
-
   function formatContent(content: string) {
     const paragraphs = content.split('\n');
 
@@ -135,6 +135,38 @@ export default function PostDetail() {
     }
   };
   
+  const toggleMenu = (commentId: string) => {
+    setMenuOpen(prevMenuOpen => (prevMenuOpen === commentId ? null : commentId));
+  };
+
+  const deleteComment = async (postId: string, commentId: string) => {
+    const confirmDelete = confirm('Are you sure you want to delete this comment?');
+    if (!confirmDelete) return;
+
+    try {
+      setLoading(true);
+      const response = await fetch(`/api`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'DELETE_COMMENT', postId, commentId, token: localStorage.getItem('token') }),
+      });
+      
+      const data = await response.json();
+      if (response.ok) {
+        setComments(prevComment => prevComment.filter(comment => comment._id !== commentId));
+        alert('comment deleted successfully');
+        setMenuOpen(null);
+      } else {
+        console.error('Failed to delete comment:', data.error);
+        alert('Error deleting comment');
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error('Error deleting comment:', error);
+      alert('Error deleting comment');
+    }
+  };
 
   return (
     <div className='containernop w-full text-black h-screen'>
@@ -176,11 +208,39 @@ export default function PostDetail() {
             <ol className='w-full flex flex-col gap-2'>
               {post?.comments?.length > 0 ? (
                 post.comments.map((comment: any) => (
-                  <li key={comment._id} className='w-full border-[1px] border-secondary rounded-[10px] px-4 py-2 flex flex-col hover:bg-gray-200 active:bg-gray-300'>
-                      <p className='text-sm text-gray-600'>
-                        @{comment.userId?.username || username} at {formatDate(comment.createdAt)}
-                      </p>
+                  <li key={comment._id} className='w-full relative border-[1px] border-secondary rounded-[10px] px-4 py-2 flex flex-col hover:bg-gray-200 active:bg-gray-300'>
+                      <div className='w-full flex flex-row justify-between'>
+                        <p className='text-sm text-gray-600'>
+                          @{comment.userId?.username || username} at {formatDate(comment.createdAt)}
+                        </p>
+                        <div className='text-red-500 hover:text-red-700 text-sm cursor-pointer' onClick={() => toggleMenu(comment._id)}>
+                          <Image src={downArr} width={20} height={20} alt={'Menu'}/>
+                        </div>
+                      </div>
+                      
                       {comment?.content || 'No content available'}
+
+                      {menuOpen === comment._id && (
+                      <div className='flex absolute z-30 top-0 right-0 px-3 w-[50%] py-1 border-secondary rounded-[7px] bg-white mr-1 mt-1 shadow-md'>
+                        <div className='w-full'>
+                          <div className='flex flex-row w-full justify-between items-end'>
+                            <h1 className='text-xs'>Options</h1>
+                            <h1 className='text-xs text-red-600 hover:font-semibold hover:blue cursor-pointer' onClick={() => toggleMenu(post._id)}>Close</h1>
+                          </div>
+                          <hr className='mt-1'/>
+                          <div className='w-full flex flex-col gap-2 mt-1 text-sm'>
+                            {post.userId.email === email && (
+                            <div className='gap-2 flex flex-col'>
+                              <p onClick={() => deleteComment(post._id, comment._id)} className='cursor-pointer hover:font-semibold hover:text-red-600'>Delete Comment</p>
+                              <p className='cursor-pointer hover:font-semibold hover:blue'>Edit Comment</p>
+                            </div>
+                            )}
+                            <p className='cursor-pointer hover:font-semibold'>Profile @{post.userId.username} {post.userId.username === username ? "(You)" : ""}</p>
+                            <p className='cursor-pointer hover:font-semibold hover:text-green-600'>Copy Text</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </li>
                 ))
               ) : (

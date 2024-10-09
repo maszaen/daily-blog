@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
       CREATE_POST,
       DELETE_POST,
       CREATE_COMMENT,
+      DELETE_COMMENT,
       GET_USER_BY_ID,
       GET_POST_BY_ID,
     };
@@ -199,6 +200,40 @@ async function CREATE_COMMENT(body: any) {
   } catch (error) {
     console.error('Error creating comment:', error);
     return NextResponse.json({ error: 'Error creating comment' }, { status: 500 });
+  }
+}
+
+// DELETE_COMMENT
+async function DELETE_COMMENT(body: any) {
+  const { postId, commentId, token } = body;
+  
+  if (!commentId || !token) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  }
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
+    const userId = (decodedToken as jwt.JwtPayload).id;
+    const comment = await Comment.findById(commentId);
+    if (!comment) {
+      return NextResponse.json({ error: 'The specified comment could not be found or has already been deleted' }, { status: 404 });
+    }
+    if (comment.userId.toString() !== userId) {
+      return NextResponse.json({ error: 'You not authorized to delete this comment' }, { status: 403 });
+    }
+
+    await Post.findByIdAndUpdate(postId, {
+      $pull: { comments: commentId }
+    });
+
+    await User.findByIdAndUpdate(userId, {
+      $pull: { comments: commentId }
+    });
+    await Comment.findByIdAndDelete(commentId);
+
+    return NextResponse.json({ message: 'Post deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting comment:', error);
+    return NextResponse.json({ error: 'Error deleting comment' }, { status: 500 });
   }
 }
 
