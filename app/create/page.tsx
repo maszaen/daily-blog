@@ -66,7 +66,7 @@ export default function CreatePost() {
             alignment = null;
           }
 
-          let segments = [];
+          const segments = [];
           let currentSegment = { text: '', isBold: false };
 
           textNodes.forEach((node) => {
