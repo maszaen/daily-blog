@@ -12,6 +12,7 @@ export default function CreatePost() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [email, setEmail] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -30,66 +31,82 @@ export default function CreatePost() {
       const selectedFile = e.target.files[0];
       setFile(selectedFile);
       setTitle(selectedFile.name.replace(/\.docx$/, ''));
-      setCategory(''); 
+      setCategory('');
+      setShowPreview(false);
     }
   };
 
   const handleFileUpload = async () => {
     if (!category) {
-      setError('Category is required before uploading a file.');
+      setError('Please complete all form fields.');
       return;
     }
-  
+
     if (file) {
       try {
         const arrayBuffer = await file.arrayBuffer();
         const zip = await JSZip.loadAsync(arrayBuffer);
         const docFile = zip.file("word/document.xml");
-  
+
         if (!docFile) {
           throw new Error('Document file not found in the ZIP archive.');
         }
         const doc = await docFile.async("text");
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(doc, "application/xml");
-  
+
         const paragraphs = xmlDoc.getElementsByTagName("w:p");
         const contentArray = Array.from(paragraphs).map(paragraph => {
           const textNodes = Array.from(paragraph.getElementsByTagName("w:t"));
           const alignmentNode = paragraph.getElementsByTagName("w:jc")[0];
           let alignment = alignmentNode ? alignmentNode.getAttribute("w:val") : null;
-  
+
           const validAlignments = ['left', 'right', 'center', 'justify'];
           if (!validAlignments.includes(alignment || '')) {
             alignment = null;
           }
-  
-          const segments = textNodes
-            .map(node => {
-              const parent = node.parentNode; 
-              const isBold = parent && (parent as Element).getElementsByTagName("w:b").length > 0; 
-              return { text: node.textContent || '', isBold: isBold || false }; 
-            })
-            .filter(segment => segment.text.trim() !== '');
-  
+
+          let segments = [];
+          let currentSegment = { text: '', isBold: false };
+
+          textNodes.forEach((node) => {
+            const parent = node.parentNode;
+            const isBold = parent && (parent as Element).getElementsByTagName("w:b").length > 0;
+            const textContent = node.textContent || '';
+
+            if (currentSegment.isBold !== isBold) {
+              if (currentSegment.text.trim() !== '') {
+                segments.push(currentSegment);
+              }
+              currentSegment = { text: textContent, isBold: isBold || false };
+            } else {
+              currentSegment.text += textContent;
+            }
+          });
+
+          if (currentSegment.text.trim() !== '') {
+            segments.push(currentSegment);
+          }
+
           return {
             segments,
             alignment,
           };
         }).filter(item => item.segments.length > 0);
-        
+
         setContent(contentArray);
         setError('');
+        setShowPreview(true);
       } catch (err) {
         setError('Error reading the file. Please try again.');
         console.error('Error reading file:', err);
       }
     }
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     const formattedContent = content.map(item => ({
       alignment: item.alignment,
       segments: item.segments.map(segment => ({
@@ -97,18 +114,18 @@ export default function CreatePost() {
         text: segment.text,
       })),
     }));
-  
+
     if (!title || !category || !formattedContent.length || formattedContent.some(item => !item.segments.length || !item.segments.some(seg => seg.text.trim()))) {
       setError('Title, category, and valid content are required.');
       return;
     }
-  
+
     setIsSubmitting(true);
     setError('');
-  
+
     try {
       const token = localStorage.getItem('token');
-  
+
       const res = await fetch('/api', {
         method: 'POST',
         headers: {
@@ -122,12 +139,12 @@ export default function CreatePost() {
           token,
         }),
       });
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         throw new Error(data.error || 'Something went wrong');
-      }  
+      }
       router.push('/dashboard');
     } catch (error: any) {
       setError(error.message);
@@ -135,8 +152,6 @@ export default function CreatePost() {
       setIsSubmitting(false);
     }
   };
-  
-  
 
   return (
     <div className='text-black containernop flex flex-col justify-start items-start w-full h-full'>
@@ -148,10 +163,9 @@ export default function CreatePost() {
           <label className="drop-container" id="dropcontainer">
             <p className="drop-title">Drop files here</p>
             or
-            <input type="file" id="images" accept=".docx" onChange={handleFileChange} required/>
+            <input type="file" id="images" accept=".docx" onChange={handleFileChange} required />
           </label>
-          <button type='button' onClick={handleFileUpload} className='rounded-[5px] items-center justify-center w-full'>Upload Docx</button>
-          <hr className='my-7'/>
+          <hr className='my-7' />
           <label>
             <input
               className='input'
@@ -176,13 +190,12 @@ export default function CreatePost() {
             />
             <span>Category</span>
           </label>
-          
 
           {error && <p className='font-semibold text-center' style={{ color: 'red' }}>{error}</p>}
-          {content.length > 0 && (
+          {content.length > 0 && showPreview && (
             <div className='mt-4 border rounded-[4px]' style={{ margin: 'auto' }}>
               <h3 className='font-semibold mb-4 mt-4'>Preview Content:</h3>
-              <div className='text-sm' style={{ border: '1px solid #ccc', padding: '25px', backgroundColor: '#f9f9f9',boxShadow: '0 2px 5px rgba(0,0,0,0.1)', borderRadius: '4px' }}>
+              <div className='text-sm' style={{ border: '1px solid #ccc', padding: '25px', backgroundColor: '#f9f9f9', boxShadow: '0 2px 5px rgba(0,0,0,0.1)', borderRadius: '4px' }}>
                 {content.map((item, index) => (
                   <div
                     key={index}
@@ -210,8 +223,13 @@ export default function CreatePost() {
           <div className='flex flex-row items-center justify-between pl-5 px-2 py-2 border-secondary rounded-full w-full'>
             <p className='text-md'>User: {email}</p>
             <div>
-              <button type="submit" disabled={isSubmitting} className='submit'>
-                {isSubmitting ? 'Creating ...' : 'Create Post'}
+              <button 
+                type="button" 
+                onClick={showPreview ? handleSubmit : handleFileUpload} // Panggil fungsi sesuai kondisi
+                disabled={isSubmitting} 
+                className='submit'
+              >
+                {isSubmitting ? 'Creating ...' : (showPreview ? 'Create Post' : 'Show Preview')}
               </button>
             </div>
           </div>

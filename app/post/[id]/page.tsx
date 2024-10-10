@@ -69,6 +69,11 @@ export default function PostDetail() {
       return <p>No content available</p>;
     }
   
+    const normalizeText = (text: string) => {
+      // Menambahkan spasi setelah titik dua jika tidak ada
+      return text.replace(/:([^\s])/g, ': $1');
+    };
+  
     return content.map((item: any, index: number) => {
       if (!item.segments || !Array.isArray(item.segments)) {
         console.error('Invalid segments in content:', item);
@@ -84,17 +89,24 @@ export default function PostDetail() {
   
       return (
         <p key={index} style={style}>
-          {item.segments.map((segment: { isBold: boolean; text: string }, segIndex: number) => (
-            segment.isBold ? (
-              <strong key={segIndex}>{segment.text}</strong>
-            ) : (
-              <span key={segIndex}>{segment.text}</span>
-            )
-          ))}
+          {item.segments.map((segment: { isBold: boolean; text: string }, segIndex: number, arr: any[]) => {
+            const normalizedText = normalizeText(segment.text);
+  
+            const nextSegment = arr[segIndex + 1];
+            const needsSpaceAfter = nextSegment && !normalizedText.endsWith('') && !nextSegment.text.startsWith(' ');
+  
+            return (
+              <span key={segIndex}>
+                {segment.isBold ? <strong>{normalizedText}</strong> : normalizedText}
+                {needsSpaceAfter && ' '}
+              </span>
+            );
+          })}
         </p>
       );
     });
   };
+  
   
   
 
