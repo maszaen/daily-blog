@@ -5,6 +5,7 @@ import { Topbar, Loader } from '../export';
 import Image from 'next/image';
 import downArr from '../assets/down-arrow.svg';
 import { useRouter } from 'next/navigation';
+import filterLogo from '../assets/filter.svg';
 
 export default function Dashboard() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -15,6 +16,9 @@ export default function Dashboard() {
   const [email, setEmail] = useState('');
   const [menuOpen, setMenuOpen] = useState<string | null>(null);
   const router = useRouter();
+  const [filterMenu, setFilterMenu] = useState(false);
+
+  const toggleFilter = () => { setFilterMenu(!filterMenu); };
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
@@ -108,6 +112,40 @@ export default function Dashboard() {
   return (
     <div className='text-black justify-start w-full h-full flex flex-col containernop'>
       <Topbar onSearch={handleSearch} />
+
+      <div className='flex flex-row w-full relative justify-between h-[30px] items-center p-2 pt-4 select-none pb-0 text-xs'>
+        <p className='font-semibold'>Not Filtered</p>
+        <div onClick={toggleFilter} className='flex flex-row items-center relative justify-center cursor-pointer'>
+          <p className='mr-10 font-semibold'>Filter Post</p>
+          <Image src={filterLogo} className='flex items-center absolute bottom-[-110%] right-0' width={35} height={35} alt={''}></Image>
+        </div>
+        {filterMenu && (
+          <div className='flex absolute z-30 top-0 right-0 px-3 w-[50%] mr-2 sm:mr-0 py-1 border-secondary rounded-[7px] bg-white mt-3 shadow-md'>
+          <div className='w-full'>
+            <div className='flex flex-row w-full justify-between items-end'>
+              <h1 className='text-xs'>Filtering</h1>
+              <h1 className='text-xs text-red-600 hover:font-semibold hover:blue cursor-pointer' onClick={toggleFilter}>Close</h1>
+            </div>
+            <hr className='mt-1'/>
+            <div className='w-full flex flex-col gap-2 mt-1 text-sm'>
+              <select
+                value={search || ''}
+                onChange={(e) => setSearch(e.target.value)}
+                className='rounded p-1'>
+                <option value="">All Categories</option>
+                <option value="Algoritma dan Pemrograman">Algoritma dan Pemrograman</option>
+                <option value="Arsitektur Komputer">Arsitektur Komputer</option>
+                <option value="Bahasa Inggris">Bahasa Inggris</option>
+                <option value="Ekonomi Kreatif">Ekonomi Kreatif</option>
+                <option value="Pendidikan Agama">Pendidikan Agama</option>
+                <option value="Pendidikan Pancasila">Pendidikan Pancasila</option>
+                <option value="Sistem Operasi">Sistem Operasi</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        )}
+      </div>
       
       {loading ? (
         <div className='flex flex-col w-full justify-center items-center h-screen select-none'>
