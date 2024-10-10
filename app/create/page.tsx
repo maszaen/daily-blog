@@ -65,9 +65,9 @@ export default function CreatePost() {
           const firstLineIndentNode = paragraph.getElementsByTagName("w:ind")[0];
   
           let alignment = alignmentNode ? alignmentNode.getAttribute("w:val") as "center" | "left" | "right" : "left";
-          let spacing = spacingNode ? parseFloat(spacingNode.getAttribute("w:after") || '0') : null;
+          const spacing = spacingNode ? parseFloat(spacingNode.getAttribute("w:after") || '0') : null;
   
-          let bullet = bulletNode && bulletNode.getElementsByTagName("w:ilvl").length > 0;
+          const bullet = bulletNode && bulletNode.getElementsByTagName("w:ilvl").length > 0;
   
           let firstLineIndent = firstLineIndentNode ? parseFloat(firstLineIndentNode.getAttribute("w:firstLine") || '0') : 0;
   
