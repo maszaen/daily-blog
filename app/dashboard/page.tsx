@@ -159,7 +159,7 @@ export default function Dashboard() {
                   <li
                     className='w-full animated relative border-[1px] border-secondary rounded-[10px] px-4 py-2 flex flex-col hover:bg-gray-200 animate-card hover:animate-default'
                     key={post._id}>
-                    <div className='w-full flex flex-row justify-between'>
+                    <div className='w-full max-w-[80%] flex flex-row justify-between'>
                       <Link href={`/post/${post._id}`} key={post._id} className='hover:blue active:text-violet-800'>
                         <p className='text-xs'>Posted by @{post.userId?.username || 'Unknown'} | {formatDate(post.createdAt)}</p>
                         <h3 className='font-semibold'>{post.title}</h3>
