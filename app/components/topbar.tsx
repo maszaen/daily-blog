@@ -12,6 +12,18 @@ const Topbar: React.FC<TopbarProps> = ({ onSearch }) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [menu, setMenu] = useState(false);
+  const [delayMenu, setDelayMenu] = useState(false);
+
+  useEffect(() => {
+    if (menu) {
+      const timer = setTimeout(() => setDelayMenu(true), 50);
+      return () => clearTimeout(timer);
+    } else {
+      const timer = setTimeout(() => setDelayMenu(false), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [menu]);
+
   const [searchInput, setSearchInput] = useState('');
   
   useEffect(() => {
@@ -88,15 +100,14 @@ const Topbar: React.FC<TopbarProps> = ({ onSearch }) => {
           </svg>
         </label>
       </div>
-      {menu && (
-        <div className='h-full w-full flex'>
-          <div className='backMenu'>
+      <div className={`h-full w-full hidden animated ${menu ? 'flexing' : ''}`}>
+        <div className={`backMenu animate-default opacity-0 animated ${delayMenu ? 'opacity-100 animate-card' : ''}`}>
           <div className='menu'>
             <div>
               <div className='flex flex-row justify-between items-start'>
                 <h1 className='font-semibold text-xl md:text-2xl'>{username}</h1>
               </div>
-              <p className='text-xs md:text-base'>{email}</p>
+              <p className='text-xs md:text-base'>{email}{menu === true ? 'true' : 'false'}</p>
               <hr className='mt-3' />
               <div className='text-sm mt-2 flex flex-row justify-between gap-5'>
                 <div className='flex flex-col w-[100px]'>
@@ -133,8 +144,7 @@ const Topbar: React.FC<TopbarProps> = ({ onSearch }) => {
             </button>
           </div>
         </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

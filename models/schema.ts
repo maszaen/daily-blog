@@ -1,9 +1,17 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-interface IContentItem {
+interface IContentSegment {
   text: string;
   isBold: boolean;
+}
+
+export interface IContentItem {
   alignment: 'left' | 'center' | 'right';
+  segments: IContentSegment[];
+  spacing?: number | null;
+  firstLineIndent?: number | null;
+  bullet?: boolean;  // Indicates if the paragraph is a bullet point
+  lineCount: number; // Total number of lines in this content item
 }
 
 interface IUser extends Document {
@@ -48,7 +56,7 @@ export const Comment = mongoose.models.Comment || mongoose.model<IComment>('Comm
 interface IPost extends Document {
   userId: Schema.Types.ObjectId;
   title: string;
-  content: IContentItem[];
+  content: IContentItem[];  // Updated to include new formatting properties
   category: string;
   comments: Schema.Types.ObjectId[];
   createdAt: Date;
@@ -63,10 +71,15 @@ const PostSchema: Schema = new Schema({
       isBold: { type: Boolean, default: false },
       text: { type: String, required: true },
     }],
+    spacing: { type: Number, default: null },
+    firstLineIndent: { type: Number, default: null },
+    bullet: { type: Boolean, default: false },
+    lineCount: { type: Number, required: true },
   }],
   category: { type: String, required: true },
   comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
   createdAt: { type: Date, default: Date.now },
 });
+
 
 export const Post = mongoose.models.Post || mongoose.model<IPost>('Post', PostSchema);

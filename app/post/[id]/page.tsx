@@ -63,49 +63,59 @@ export default function PostDetail() {
     return <p>{error}</p>;
   }
 
-  const formatContent = (content: any) => {
+  const parseContent = (content: any) => {
     if (!Array.isArray(content)) {
       console.error('Invalid content format:', content);
       return <p>No content available</p>;
     }
   
-    const normalizeText = (text: string) => {
-      // Menambahkan spasi setelah titik dua jika tidak ada
-      return text.replace(/:([^\s])/g, ': $1');
+    const normalizeText = (text: any) => {
+      return text.replace(/:([^\s])/g, ': $1'); // Normalisasi teks
     };
   
-    return content.map((item: any, index: number) => {
+    return content.map((item, index) => {
       if (!item.segments || !Array.isArray(item.segments)) {
         console.error('Invalid segments in content:', item);
         return <p key={index}>Invalid content segment format</p>;
       }
   
-      const style: React.CSSProperties = {
+      const style = {
         textAlign: item.alignment || 'left',
         margin: '10px 0',
         lineHeight: '1.5',
         whiteSpace: 'pre-wrap',
+        paddingLeft: index === 0 ? `${item.firstLineIndent}px` : '0px', // Hanya pada paragraf pertama
       };
   
+      const bullet = item.bullet ? <span style={{ marginRight: '5px' }}>•</span> : null;
+  
       return (
-        <p key={index} style={style}>
-          {item.segments.map((segment: { isBold: boolean; text: string }, segIndex: number, arr: any[]) => {
+        <div key={index} style={style}>
+          {bullet}
+          {item.segments.map((segment: { text: string; isBold: boolean }, segIndex: number) => {
             const normalizedText = normalizeText(segment.text);
-  
-            const nextSegment = arr[segIndex + 1];
-            const needsSpaceAfter = nextSegment && !normalizedText.endsWith('') && !nextSegment.text.startsWith(' ');
-  
             return (
-              <span key={segIndex}>
-                {segment.isBold ? <strong>{normalizedText}</strong> : normalizedText}
-                {needsSpaceAfter && ' '}
+              <span key={segIndex} style={{ fontWeight: segment.isBold ? 'bold' : 'normal' }}>
+                {normalizedText}
+                {segIndex < item.segments.length - 1 && ' '}
               </span>
             );
           })}
-        </p>
+          {Array.from({ length: item.lineCount - 1 }, (_, lineIdx) => (
+            <br key={`line-${index}-${lineIdx}`} />
+          ))}
+        </div>
       );
     });
   };
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   
@@ -209,7 +219,7 @@ export default function PostDetail() {
           <p className='text-sm lg:text-md'>Posted by: {post.userId?.username || 'Unknown'}</p>
         </div>
         <hr className='mb-3' />
-        <div className='w-full'>{formatContent(post.content)}</div>
+        <div className='w-full'>{parseContent(post.content)}</div>
         <div className='pt-4'>
           <form onSubmit={handleSubmit}>
             <div className='searchContainer flex-row items-center h-full'>

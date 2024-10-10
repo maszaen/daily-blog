@@ -10,6 +10,7 @@
     "git": "git add . && git commit -m 'fix-some-error' && git push origin main --force"
   },
   "dependencies": {
+    "@types/react-pdf": "^6.2.0",
     "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
@@ -18,7 +19,8 @@
     "mongoose": "^8.7.0",
     "next": "14.2.13",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-pdf": "^9.1.1"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

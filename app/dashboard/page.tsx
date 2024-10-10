@@ -95,7 +95,6 @@ export default function Dashboard() {
       const data = await response.json();
       if (response.ok) {
         setPosts(prevPosts => prevPosts.filter(post => post._id !== postId));
-        alert('Post deleted successfully');
         setMenuOpen(null);
       } else {
         console.error('Failed to delete post:', data.error);
@@ -158,7 +157,7 @@ export default function Dashboard() {
               <ul className='w-full flex flex-col gap-2'>
                 {posts.map((post) => (
                   <li
-                    className='w-full relative border-[1px] border-secondary rounded-[10px] px-4 py-2 flex flex-col hover:bg-gray-200'
+                    className='w-full animated relative border-[1px] border-secondary rounded-[10px] px-4 py-2 flex flex-col hover:bg-gray-200 animate-card hover:animate-default'
                     key={post._id}>
                     <div className='w-full flex flex-row justify-between'>
                       <Link href={`/post/${post._id}`} key={post._id} className='hover:blue active:text-violet-800'>
