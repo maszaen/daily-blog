@@ -34,7 +34,7 @@ export default function PostDetail() {
             setError(data.error || 'Post not found');
           }
         } catch (error) {
-          console.error('Error fetching post:', error);
+          console.error('Fetch error:', error);
           setError('Error fetching post');
         } finally {
           setLoading(false);
