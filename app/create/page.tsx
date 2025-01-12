@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import JSZip from 'jszip';
 import { IContentItem } from '@/models/schema';
 
@@ -15,17 +15,54 @@ export default function CreatePost() {
   const [file, setFile] = useState<File | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [action, setAction] = useState<'CREATE_POST' | 'UPDATE_POST'>('CREATE_POST');
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
     const storedEmail = localStorage.getItem('email');
+    const postId = searchParams.get('id');
 
     if (storedUsername && storedEmail) {
       setEmail(storedEmail);
     } else {
       router.push('/login');
     }
-  }, [router]);
+    if (postId) {
+      setAction('UPDATE_POST');
+      fetchPostData(postId);
+    } else {
+      setAction('CREATE_POST');
+    }
+  }, [router, searchParams]);
+
+  const fetchPostData = async (postId: string) => {
+    try {
+        const response = await fetch(`/api`, 
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'GET_POST_BY_ID',
+              postId: postId,
+            }),
+          });
+        const data = await response.json();
+        console.log(data);
+
+        if (response.ok) {
+            setTitle(data.post?.title);
+            setCategory(data.post?.category);
+            setShowPreview(true);
+            console.log('Title:', title);
+            console.log('Category:', category);
+        } else {
+            setError(data.error || 'Error fetching post');
+        }
+    } catch (err) {
+        console.error('Error fetching post:', err);
+        setError('Error fetching post data');
+    }};
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -36,7 +73,7 @@ export default function CreatePost() {
       setShowPreview(false);
     }
   };
-
+  
   const handleFileUpload = async () => {
     if (!category) {
       setError('Please complete all form fields.');
@@ -145,6 +182,8 @@ export default function CreatePost() {
 
     try {
       const token = localStorage.getItem('token');
+      const actionType = action === 'CREATE_POST' ? 'CREATE_POST' : 'UPDATE_POST';
+      const postId = searchParams.get('id');
 
       const res = await fetch('/api', {
         method: 'POST',
@@ -152,11 +191,12 @@ export default function CreatePost() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          action: 'CREATE_POST',
+          action: actionType,
           title,
           content: formattedContent,
           category,
           token,
+          ...(actionType === 'UPDATE_POST' && { postId })
         }),
       });
 
@@ -172,6 +212,21 @@ export default function CreatePost() {
       setIsSubmitting(false);
     }
   };
+
+  const formatEmail = (email: string) => {
+    if (!email) return '';
+  
+    const [localPart, domain] = email.split('@');
+    if (!domain) return email; // Kembali ke email asli jika format tidak benar
+  
+    const [domainName, tld] = domain.split('.');
+    const formattedLocalPart = `${localPart.charAt(0)}${'*'.repeat(localPart.length - 2)}${localPart.charAt(localPart.length - 1)}`;
+    const formattedDomain = `${domainName.charAt(0)}${'*'.repeat(domainName.length - 1)}.${tld}`;
+  
+    return `${formattedLocalPart}@${formattedDomain}`;
+  };
+
+  const formattedEmail = formatEmail(email);
 
   return (
     <div className='text-black containernop flex flex-col justify-start items-start w-full h-full'>
@@ -261,20 +316,13 @@ export default function CreatePost() {
                 </div>
               );
               })}
-
-
-
-
-
-
-
               </div>
             </div>
           )}
         </div>
         <div className='flex flex-row px-4 py-8 w-full '>
           <div className='flex flex-row items-center justify-between pl-5 px-2 py-2 border-secondary rounded-full w-full'>
-            <p className='text-md'>User: {email}</p>
+            <p className='text-md'>{formattedEmail}</p>
             <div>
               <button 
                 type="button" 
@@ -282,7 +330,7 @@ export default function CreatePost() {
                 disabled={isSubmitting} 
                 className='submit'
               >
-                {isSubmitting ? 'Creating ...' : (showPreview ? 'Create Post' : 'Show Preview')}
+                {isSubmitting ? 'Creating ...' : (showPreview ? (action === 'UPDATE_POST' ? 'Update' : 'Upload') : 'Preview')}
               </button>
             </div>
           </div>

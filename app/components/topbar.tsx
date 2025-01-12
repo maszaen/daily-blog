@@ -5,25 +5,16 @@ import jwt from 'jsonwebtoken';
 
 interface TopbarProps {
   onSearch: (value: string) => void;
+  setExportMenu: (value: boolean) => void;
+  setExportDelayMenu: (value: boolean) => void;
 }
 
-const Topbar: React.FC<TopbarProps> = ({ onSearch }) => {
+const Topbar: React.FC<TopbarProps> = ({ onSearch, setExportMenu, setExportDelayMenu }) => {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [menu, setMenu] = useState(false);
   const [delayMenu, setDelayMenu] = useState(false);
-
-  useEffect(() => {
-    if (menu) {
-      const timer = setTimeout(() => setDelayMenu(true), 50);
-      return () => clearTimeout(timer);
-    } else {
-      const timer = setTimeout(() => setDelayMenu(false), 50);
-      return () => clearTimeout(timer);
-    }
-  }, [menu]);
-
   const [searchInput, setSearchInput] = useState('');
   
   useEffect(() => {
@@ -71,7 +62,21 @@ const Topbar: React.FC<TopbarProps> = ({ onSearch }) => {
   };
 
   const toggleMenu = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMenu(event.target.checked);
+    if (event.target.checked) {
+      const menu2 = setTimeout(() => setExportMenu(true), 50);
+      const menu1 = setTimeout(() => setMenu(true), 250);
+      const timer = setTimeout(() => {setDelayMenu(true), setExportDelayMenu(true)}, 350);
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(menu2);
+        clearTimeout(menu1);
+      };
+    } else {
+      setDelayMenu(false);
+      setExportDelayMenu(false);
+      const timer = setTimeout(() => {setMenu(false), setExportMenu(false)}, 150);
+      return () => clearTimeout(timer);
+    }
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,8 +86,8 @@ const Topbar: React.FC<TopbarProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="w-full h-full">
-      <div className='topbar'>
+    <div className="w-full h-full flex flex-col relative">
+      <div className='topbar flex'>
         <div className='searchContainer'>
           <label>
             <input onChange={handleInputChange} value={searchInput} type='text' placeholder='' className='w-full p-[18px]' />
@@ -100,9 +105,9 @@ const Topbar: React.FC<TopbarProps> = ({ onSearch }) => {
           </svg>
         </label>
       </div>
-      <div className={`h-full w-full hidden animated ${menu ? 'flexing' : ''}`}>
+      <div className={`h-full w-full hidden pt-2 px-2 sm:px-0 top-[500px] animated ${menu ? 'flexing' : ''}`}>
         <div className={`backMenu animate-default opacity-0 animated ${delayMenu ? 'opacity-100 animate-card' : ''}`}>
-          <div className='menu'>
+          <div className='menu h-auto absolute'>
             <div>
               <div className='flex flex-row justify-between items-start'>
                 <h1 className='font-semibold text-xl md:text-2xl'>{username}</h1>

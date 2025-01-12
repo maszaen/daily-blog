@@ -15,6 +15,7 @@ export async function POST(req: NextRequest) {
       LOGIN,
       REGIST,
       CREATE_POST,
+      UPDATE_POST,
       DELETE_POST,
       CREATE_COMMENT,
       DELETE_COMMENT,
@@ -131,6 +132,49 @@ const CREATE_POST = async (body: any) => {
     console.error('Error creating post:', error);
     const errorMessage = (error as Error).message;
     return NextResponse.json({ error: `Error creating post: ${errorMessage}` }, { status: 500 });
+  }
+};
+
+// UPDATE_POST
+const UPDATE_POST = async (body: any) => {
+  const { postId, title, content, token, category } = body;
+
+  if (!postId || !title || !content || !token || !category) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET!);
+    const userId = (decodedToken as jwt.JwtPayload).id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    if (!Array.isArray(content) || content.length === 0) {
+      return NextResponse.json({ error: 'Invalid content format' }, { status: 400 });
+    }
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      return NextResponse.json({ error: 'Post not found' }, { status: 404 });
+    }
+    if (post.userId.toString() !== userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
+    post.title = title;
+    post.content = content;
+    post.category = category;
+    post.updatedAt = new Date();
+
+    await post.save();
+
+    return NextResponse.json({ message: 'Post updated successfully', post }, { status: 200 });
+  } catch (error) {
+    console.error('Error updating post:', error);
+    const errorMessage = (error as Error).message;
+    return NextResponse.json({ error: `Error updating post: ${errorMessage}` }, { status: 500 });
   }
 };
 

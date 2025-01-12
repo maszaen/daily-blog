@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import send from '../../assets/send.svg';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import downArr from '../../assets/down-arrow.svg';
+import send from '../../assets/send.svg';
 
 export default function PostDetail() {
   const router = useRouter();
@@ -84,7 +84,7 @@ export default function PostDetail() {
         margin: '10px 0',
         lineHeight: '1.5',
         whiteSpace: 'pre-wrap',
-        paddingLeft: index === 0 ? `${item.firstLineIndent}px` : '0px', // Hanya pada paragraf pertama
+        paddingLeft: index === 0 ? `${item.firstLineIndent}px` : '0px',
       };
   
       const bullet = item.bullet ? <span style={{ marginRight: '5px' }}>•</span> : null;

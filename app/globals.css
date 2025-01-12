@@ -42,6 +42,12 @@
   .flexing {
     @apply flex !important;
   }
+  .animate-default-topbar {
+    transform: translateY(190px);
+  }
+  .animate-topbar {
+    transform: translateY(0);
+  }
   .animate-default {
     transform: scale(0.97);
   }
